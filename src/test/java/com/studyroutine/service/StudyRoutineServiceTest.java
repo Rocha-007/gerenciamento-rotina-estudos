@@ -14,87 +14,58 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-/**
- * Unit tests for the StudyRoutineService class.
- */
 public class StudyRoutineServiceTest {
+    private StudyRoutineService svc;
 
-    private StudyRoutineService service;
-
-    /**
-     * Sets up the test fixtures.
-     */
     @BeforeEach
     public void setUp() {
-        service = new StudyRoutineService();
+        svc = new StudyRoutineService();
     }
 
-    /**
-     * Tests adding a subject successfully.
-     */
     @Test
-    public void testAddSubjectSuccess() {
-        Subject subject = service.addSubject("Mathematics", "Dr. Smith", "Calculus");
-
-        assertEquals("Mathematics", subject.getName());
-        assertEquals("Dr. Smith", subject.getProfessor());
-        assertEquals("Calculus", subject.getDescription());
-
-        List<Subject> subjects = service.getAllSubjects();
-        assertTrue(subjects.contains(subject));
+    public void testAddSubject() {
+        Subject s = svc.addSubject("Mathematics", "Dr. Smith", "Calculus");
+        assertEquals("Mathematics", s.getName());
+        assertEquals("Dr. Smith", s.getProfessor());
+        assertEquals("Calculus", s.getDescription());
+        assertTrue(svc.getAllSubjects().contains(s));
     }
 
-    /**
-     * Tests adding a subject with empty name throws exception.
-     */
     @Test
     public void testAddSubjectEmptyName() {
         assertThrows(IllegalArgumentException.class, () -> {
-            service.addSubject("", "Dr. Smith", "Description");
+            svc.addSubject("", "Dr. Smith", "Description");
         });
     }
 
-    /**
-     * Tests adding a subject with null name throws exception.
-     */
     @Test
     public void testAddSubjectNullName() {
         assertThrows(IllegalArgumentException.class, () -> {
-            service.addSubject(null, "Dr. Smith", "Description");
+            svc.addSubject(null, "Dr. Smith", "Description");
         });
     }
 
-    /**
-     * Tests removing a subject successfully.
-     */
     @Test
-    public void testRemoveSubjectSuccess() {
-        Subject subject = service.addSubject("Physics", "Dr. Johnson", "Modern Physics");
-        assertTrue(service.getAllSubjects().contains(subject));
-
-        boolean removed = service.removeSubject(subject.getId());
+    public void testRemoveSubject() {
+        Subject s = svc.addSubject("Physics", "Dr. Johnson", "Modern Physics");
+        assertTrue(svc.getAllSubjects().contains(s));
+        
+        boolean removed = svc.removeSubject(s.getId());
         assertTrue(removed);
-        assertFalse(service.getAllSubjects().contains(subject));
+        assertFalse(svc.getAllSubjects().contains(s));
     }
 
-    /**
-     * Tests removing a non-existent subject returns false.
-     */
     @Test
     public void testRemoveSubjectNotFound() {
-        boolean removed = service.removeSubject("non-existent-id");
+        boolean removed = svc.removeSubject("non-existent-id");
         assertFalse(removed);
     }
 
-    /**
-     * Tests adding a task successfully.
-     */
     @Test
-    public void testAddTaskSuccess() {
-        Subject subject = service.addSubject("Mathematics", "Dr. Smith", "Calculus");
-
-        StudyTask task = service.addTask(
-                subject.getId(),
+    public void testAddTask() {
+        Subject s = svc.addSubject("Mathematics", "Dr. Smith", "Calculus");
+        StudyTask t = svc.addTask(
+                s.getId(),
                 "Study Chapter 5",
                 LocalDate.of(2026, 3, 20),
                 LocalTime.of(14, 0),
@@ -102,157 +73,91 @@ public class StudyRoutineServiceTest {
                 3
         );
 
-        assertEquals("Study Chapter 5", task.getDescription());
-        assertEquals(subject.getId(), task.getSubjectId());
-        assertEquals(3, task.getPriority());
-
-        List<StudyTask> tasks = service.getAllTasks();
-        assertTrue(tasks.contains(task));
+        assertEquals("Study Chapter 5", t.getDescription());
+        assertEquals(s.getId(), t.getSubjectId());
+        assertEquals(3, t.getPriority());
+        assertTrue(svc.getAllTasks().contains(t));
     }
 
-    /**
-     * Tests adding a task with empty description throws exception.
-     */
     @Test
     public void testAddTaskEmptyDescription() {
-        Subject subject = service.addSubject("Mathematics", "Dr. Smith", "Calculus");
-
+        Subject s = svc.addSubject("Mathematics", "Dr. Smith", "Calculus");
         assertThrows(IllegalArgumentException.class, () -> {
-            service.addTask(
-                    subject.getId(),
-                    "",
-                    LocalDate.now(),
-                    LocalTime.of(14, 0),
-                    LocalTime.of(15, 0),
-                    3
-            );
+            svc.addTask(s.getId(), "", LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(15, 0), 3);
         });
     }
 
-    /**
-     * Tests adding a task with invalid priority throws exception.
-     */
     @Test
     public void testAddTaskInvalidPriority() {
-        Subject subject = service.addSubject("Mathematics", "Dr. Smith", "Calculus");
-
+        Subject s = svc.addSubject("Mathematics", "Dr. Smith", "Calculus");
+        
         assertThrows(IllegalArgumentException.class, () -> {
-            service.addTask(
-                    subject.getId(),
-                    "Study Chapter 5",
-                    LocalDate.now(),
-                    LocalTime.of(14, 0),
-                    LocalTime.of(15, 0),
-                    6 // Invalid priority > 5
-            );
+            svc.addTask(s.getId(), "Study", LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(15, 0), 6);
         });
 
         assertThrows(IllegalArgumentException.class, () -> {
-            service.addTask(
-                    subject.getId(),
-                    "Study Chapter 5",
-                    LocalDate.now(),
-                    LocalTime.of(14, 0),
-                    LocalTime.of(15, 0),
-                    0 // Invalid priority < 1
-            );
+            svc.addTask(s.getId(), "Study", LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(15, 0), 0);
         });
     }
 
-    /**
-     * Tests marking a task as completed.
-     */
     @Test
-    public void testMarkTaskAsCompleted() {
-        Subject subject = service.addSubject("Mathematics", "Dr. Smith", "Calculus");
-        StudyTask task = service.addTask(
-                subject.getId(),
-                "Study Chapter 5",
-                LocalDate.now(),
-                LocalTime.of(14, 0),
-                LocalTime.of(15, 0),
-                3
-        );
+    public void testMarkTaskCompleted() {
+        Subject s = svc.addSubject("Mathematics", "Dr. Smith", "Calculus");
+        StudyTask t = svc.addTask(s.getId(), "Study Chapter 5", LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(15, 0), 3);
+        
+        assertFalse(t.isCompleted());
+        svc.markTaskAsCompleted(t.getId());
 
-        assertFalse(task.isCompleted());
-
-        service.markTaskAsCompleted(task.getId());
-
-        // Reload task from service
-        List<StudyTask> tasks = service.getAllTasks();
-        StudyTask reloadedTask = tasks.stream()
-                .filter(t -> t.getId().equals(task.getId()))
-                .findFirst()
-                .orElse(null);
-
-        assertTrue(reloadedTask != null && reloadedTask.isCompleted());
+        List<StudyTask> tasks = svc.getAllTasks();
+        StudyTask reloaded = tasks.stream().filter(x -> x.getId().equals(t.getId())).findFirst().orElse(null);
+        assertTrue(reloaded != null && reloaded.isCompleted());
     }
 
-    /**
-     * Tests getting tasks by subject.
-     */
     @Test
     public void testGetTasksBySubject() {
-        Subject subject1 = service.addSubject("Mathematics", "Dr. Smith", "Calculus");
-        Subject subject2 = service.addSubject("Physics", "Dr. Johnson", "Mechanics");
+        Subject s1 = svc.addSubject("Mathematics", "Dr. Smith", "Calculus");
+        Subject s2 = svc.addSubject("Physics", "Dr. Johnson", "Mechanics");
 
-        service.addTask(subject1.getId(), "Task 1", LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(15, 0), 1);
-        service.addTask(subject1.getId(), "Task 2", LocalDate.now(), LocalTime.of(16, 0), LocalTime.of(17, 0), 2);
-        service.addTask(subject2.getId(), "Task 3", LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(11, 0), 3);
+        svc.addTask(s1.getId(), "Task 1", LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(15, 0), 1);
+        svc.addTask(s1.getId(), "Task 2", LocalDate.now(), LocalTime.of(16, 0), LocalTime.of(17, 0), 2);
+        svc.addTask(s2.getId(), "Task 3", LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(11, 0), 3);
 
-        List<StudyTask> subject1Tasks = service.getTasksBySubject(subject1.getId());
-        assertEquals(2, subject1Tasks.size());
+        List<StudyTask> s1Tasks = svc.getTasksBySubject(s1.getId());
+        assertEquals(2, s1Tasks.size());
 
-        List<StudyTask> subject2Tasks = service.getTasksBySubject(subject2.getId());
-        assertEquals(1, subject2Tasks.size());
+        List<StudyTask> s2Tasks = svc.getTasksBySubject(s2.getId());
+        assertEquals(1, s2Tasks.size());
     }
 
-    /**
-     * Tests removing a task successfully.
-     */
     @Test
-    public void testRemoveTaskSuccess() {
-        Subject subject = service.addSubject("Mathematics", "Dr. Smith", "Calculus");
-        StudyTask task = service.addTask(
-                subject.getId(),
-                "Study Chapter 5",
-                LocalDate.now(),
-                LocalTime.of(14, 0),
-                LocalTime.of(15, 0),
-                3
-        );
+    public void testRemoveTask() {
+        Subject s = svc.addSubject("Mathematics", "Dr. Smith", "Calculus");
+        StudyTask t = svc.addTask(s.getId(), "Study Chapter 5", LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(15, 0), 3);
 
-        assertTrue(service.getAllTasks().contains(task));
-
-        boolean removed = service.removeTask(task.getId());
+        assertTrue(svc.getAllTasks().contains(t));
+        boolean removed = svc.removeTask(t.getId());
         assertTrue(removed);
-        assertFalse(service.getAllTasks().contains(task));
+        assertFalse(svc.getAllTasks().contains(t));
     }
 
-    /**
-     * Tests removing a non-existent task returns false.
-     */
     @Test
     public void testRemoveTaskNotFound() {
-        boolean removed = service.removeTask("non-existent-task-id");
+        boolean removed = svc.removeTask("non-existent-task-id");
         assertFalse(removed);
     }
 
-    /**
-     * Tests that removing a subject also removes its tasks.
-     */
     @Test
     public void testRemoveSubjectRemovesTasks() {
-        Subject subject = service.addSubject("Mathematics", "Dr. Smith", "Calculus");
-        service.addTask(subject.getId(), "Task 1", LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(15, 0), 1);
-        service.addTask(subject.getId(), "Task 2", LocalDate.now(), LocalTime.of(16, 0), LocalTime.of(17, 0), 2);
+        Subject s = svc.addSubject("Mathematics", "Dr. Smith", "Calculus");
+        svc.addTask(s.getId(), "Task 1", LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(15, 0), 1);
+        svc.addTask(s.getId(), "Task 2", LocalDate.now(), LocalTime.of(16, 0), LocalTime.of(17, 0), 2);
 
-        List<StudyTask> tasksBeforeRemoval = service.getTasksBySubject(subject.getId());
-        assertEquals(2, tasksBeforeRemoval.size());
+        List<StudyTask> before = svc.getTasksBySubject(s.getId());
+        assertEquals(2, before.size());
 
-        service.removeSubject(subject.getId());
+        svc.removeSubject(s.getId());
 
-        List<StudyTask> tasksAfterRemoval = service.getTasksBySubject(subject.getId());
-        assertEquals(0, tasksAfterRemoval.size());
+        List<StudyTask> after = svc.getTasksBySubject(s.getId());
+        assertEquals(0, after.size());
     }
 }

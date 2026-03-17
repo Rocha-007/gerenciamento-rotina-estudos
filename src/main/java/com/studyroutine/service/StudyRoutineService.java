@@ -16,40 +16,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Service class for managing subjects and study tasks.
- * Handles persistence to JSON files.
- */
 public class StudyRoutineService {
-
     private static final String DATA_DIR = "data";
     private static final String SUBJECTS_FILE = DATA_DIR + File.separator + "subjects.json";
     private static final String TASKS_FILE = DATA_DIR + File.separator + "tasks.json";
 
     private List<Subject> subjects;
     private List<StudyTask> tasks;
-    private final Gson gson;
+    private Gson gson;
 
-    /**
-     * Constructs the StudyRoutineService and initializes data.
-     */
     public StudyRoutineService() {
-        this.gson = new GsonBuilder()
+        gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
                 .registerTypeAdapter(LocalTime.class, new LocalTimeTypeAdapter())
                 .setPrettyPrinting()
                 .create();
-        this.subjects = new ArrayList<>();
-        this.tasks = new ArrayList<>();
+        subjects = new ArrayList<>();
+        tasks = new ArrayList<>();
 
         ensureDataDirectory();
         loadSubjects();
         loadTasks();
     }
 
-    /**
-     * Ensures the data directory exists.
-     */
     private void ensureDataDirectory() {
         File dir = new File(DATA_DIR);
         if (!dir.exists()) {
@@ -57,32 +46,18 @@ public class StudyRoutineService {
         }
     }
 
-    /**
-     * Adds a new subject.
-     *
-     * @param name the subject name
-     * @param professor the professor name
-     * @param description the subject description
-     * @return the created Subject
-     */
     public Subject addSubject(String name, String professor, String description) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Subject name cannot be empty");
+            throw new IllegalArgumentException("Nome não pode ser vazio");
         }
 
         String id = UUID.randomUUID().toString();
-        Subject subject = new Subject(id, name, professor, description);
-        subjects.add(subject);
+        Subject s = new Subject(id, name, professor, description);
+        subjects.add(s);
         saveSubjects();
-        return subject;
+        return s;
     }
 
-    /**
-     * Removes a subject and all associated tasks.
-     *
-     * @param subjectId the subject id
-     * @return true if removed, false if not found
-     */
     public boolean removeSubject(String subjectId) {
         boolean removed = subjects.removeIf(s -> s.getId().equals(subjectId));
         if (removed) {
@@ -93,48 +68,26 @@ public class StudyRoutineService {
         return removed;
     }
 
-    /**
-     * Gets all subjects.
-     *
-     * @return list of subjects
-     */
     public List<Subject> getAllSubjects() {
         return new ArrayList<>(subjects);
     }
 
-    /**
-     * Adds a new study task.
-     *
-     * @param subjectId the subject id
-     * @param description the task description
-     * @param dueDate the due date
-     * @param startTime the start time
-     * @param endTime the end time
-     * @param priority the priority level
-     * @return the created StudyTask
-     */
     public StudyTask addTask(String subjectId, String description, LocalDate dueDate,
                               LocalTime startTime, LocalTime endTime, int priority) {
         if (description == null || description.trim().isEmpty()) {
-            throw new IllegalArgumentException("Task description cannot be empty");
+            throw new IllegalArgumentException("Descrição não pode ser vazia");
         }
         if (priority < 1 || priority > 5) {
-            throw new IllegalArgumentException("Priority must be between 1 and 5");
+            throw new IllegalArgumentException("Prioridade de 1 a 5");
         }
 
         String id = UUID.randomUUID().toString();
-        StudyTask task = new StudyTask(id, subjectId, description, dueDate, startTime, endTime, priority);
-        tasks.add(task);
+        StudyTask t = new StudyTask(id, subjectId, description, dueDate, startTime, endTime, priority);
+        tasks.add(t);
         saveTasks();
-        return task;
+        return t;
     }
 
-    /**
-     * Removes a study task.
-     *
-     * @param taskId the task id
-     * @return true if removed, false if not found
-     */
     public boolean removeTask(String taskId) {
         boolean removed = tasks.removeIf(t -> t.getId().equals(taskId));
         if (removed) {
@@ -143,11 +96,6 @@ public class StudyRoutineService {
         return removed;
     }
 
-    /**
-     * Marks a task as completed.
-     *
-     * @param taskId the task id
-     */
     public void markTaskAsCompleted(String taskId) {
         tasks.stream()
                 .filter(t -> t.getId().equals(taskId))
@@ -158,88 +106,61 @@ public class StudyRoutineService {
                 });
     }
 
-    /**
-     * Gets all tasks for a subject.
-     *
-     * @param subjectId the subject id
-     * @return list of tasks
-     */
     public List<StudyTask> getTasksBySubject(String subjectId) {
         List<StudyTask> result = new ArrayList<>();
-        for (StudyTask task : tasks) {
-            if (task.getSubjectId().equals(subjectId)) {
-                result.add(task);
+        for (StudyTask t : tasks) {
+            if (t.getSubjectId().equals(subjectId)) {
+                result.add(t);
             }
         }
         return result;
     }
 
-    /**
-     * Gets all tasks.
-     *
-     * @return list of all tasks
-     */
     public List<StudyTask> getAllTasks() {
         return new ArrayList<>(tasks);
     }
 
-    /**
-     * Saves subjects to JSON file.
-     */
     private void saveSubjects() {
-        try (FileWriter writer = new FileWriter(SUBJECTS_FILE)) {
-            gson.toJson(subjects, writer);
+        try (FileWriter w = new FileWriter(SUBJECTS_FILE)) {
+            gson.toJson(subjects, w);
         } catch (IOException e) {
-            System.err.println("Error saving subjects: " + e.getMessage());
+            System.err.println("Erro salvando disciplinas: " + e.getMessage());
         }
     }
 
-    /**
-     * Loads subjects from JSON file.
-     */
     private void loadSubjects() {
-        File file = new File(SUBJECTS_FILE);
-        if (!file.exists()) {
-            return;
-        }
+        File f = new File(SUBJECTS_FILE);
+        if (!f.exists()) return;
 
-        try (FileReader reader = new FileReader(file)) {
-            List<Subject> loaded = gson.fromJson(reader, new TypeToken<List<Subject>>(){}.getType());
+        try (FileReader r = new FileReader(f)) {
+            List<Subject> loaded = gson.fromJson(r, new TypeToken<List<Subject>>(){}.getType());
             if (loaded != null) {
                 subjects = loaded;
             }
         } catch (IOException e) {
-            System.err.println("Error loading subjects: " + e.getMessage());
+            System.err.println("Erro carregando disciplinas: " + e.getMessage());
         }
     }
 
-    /**
-     * Saves tasks to JSON file.
-     */
     private void saveTasks() {
-        try (FileWriter writer = new FileWriter(TASKS_FILE)) {
-            gson.toJson(tasks, writer);
+        try (FileWriter w = new FileWriter(TASKS_FILE)) {
+            gson.toJson(tasks, w);
         } catch (IOException e) {
-            System.err.println("Error saving tasks: " + e.getMessage());
+            System.err.println("Erro salvando tarefas: " + e.getMessage());
         }
     }
 
-    /**
-     * Loads tasks from JSON file.
-     */
     private void loadTasks() {
-        File file = new File(TASKS_FILE);
-        if (!file.exists()) {
-            return;
-        }
+        File f = new File(TASKS_FILE);
+        if (!f.exists()) return;
 
-        try (FileReader reader = new FileReader(file)) {
-            List<StudyTask> loaded = gson.fromJson(reader, new TypeToken<List<StudyTask>>(){}.getType());
+        try (FileReader r = new FileReader(f)) {
+            List<StudyTask> loaded = gson.fromJson(r, new TypeToken<List<StudyTask>>(){}.getType());
             if (loaded != null) {
                 tasks = loaded;
             }
         } catch (IOException e) {
-            System.err.println("Error loading tasks: " + e.getMessage());
+            System.err.println("Erro carregando tarefas: " + e.getMessage());
         }
     }
 }
