@@ -3,355 +3,231 @@ package com.studyroutine.ui;
 import com.studyroutine.model.Subject;
 import com.studyroutine.model.StudyTask;
 import com.studyroutine.service.StudyRoutineService;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
+import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-/**
- * Main GUI window for the Study Routine Manager application.
- */
 public class MainWindow extends JFrame {
-
-    private static final long serialVersionUID = 1L;
-
-    private final StudyRoutineService service;
+    private StudyRoutineService service;
     private JList<Subject> subjectsList;
     private JList<StudyTask> tasksList;
 
-    /**
-     * Constructs the MainWindow.
-     */
     public MainWindow() {
-        this.service = new StudyRoutineService();
-
-        setTitle("Study Routine Manager");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        service = new StudyRoutineService();
+        
+        setTitle("Gerenciador de Rotina de Estudos");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(900, 600);
         setLocationRelativeTo(null);
         setResizable(true);
-
-        initializeUI();
+        
+        setupUI();
         setVisible(true);
     }
 
-    /**
-     * Initializes the user interface.
-     */
-    private void initializeUI() {
-        JTabbedPane tabbedPane = new JTabbedPane();
-
-        // Subjects Tab
-        tabbedPane.addTab("Subjects", createSubjectsPanel());
-
-        // Tasks Tab
-        tabbedPane.addTab("Tasks", createTasksPanel());
-
-        // About Tab
-        tabbedPane.addTab("About", createAboutPanel());
-
-        add(tabbedPane, BorderLayout.CENTER);
+    private void setupUI() {
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Disciplinas", setupDisciplinesPanel());
+        tabs.addTab("Tarefas", setupTasksPanel());
+        tabs.addTab("Sobre", setupAboutPanel());
+        add(tabs);
     }
 
-    /**
-     * Creates the subjects management panel.
-     *
-     * @return the subjects panel
-     */
-    private JPanel createSubjectsPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        // List of subjects
+    private JPanel setupDisciplinesPanel() {
+        JPanel p = new JPanel(new BorderLayout(10, 10));
+        p.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
         subjectsList = new JList<>();
         subjectsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        refreshSubjectsList();
-
-        JScrollPane scrollPane = new JScrollPane(subjectsList);
-
-        // Buttons
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 5, 5));
-        JButton addButton = new JButton("Add Subject");
-        JButton removeButton = new JButton("Remove Subject");
-
-        addButton.addActionListener(e -> addSubjectDialog());
-        removeButton.addActionListener(e -> removeSubject());
-
-        buttonPanel.add(addButton);
-        buttonPanel.add(removeButton);
-
-        panel.add(scrollPane, BorderLayout.CENTER);
-        panel.add(buttonPanel, BorderLayout.SOUTH);
-
-        return panel;
+        refreshSubjects();
+        
+        JPanel btns = new JPanel(new GridLayout(1, 2, 5, 5));
+        btns.add(createBtn("Adicionar", e -> addDisciplineDialog()));
+        btns.add(createBtn("Remover", e -> removeDiscipline()));
+        
+        p.add(new JScrollPane(subjectsList), BorderLayout.CENTER);
+        p.add(btns, BorderLayout.SOUTH);
+        return p;
     }
 
-    /**
-     * Creates the tasks management panel.
-     *
-     * @return the tasks panel
-     */
-    private JPanel createTasksPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        // List of tasks
+    private JPanel setupTasksPanel() {
+        JPanel p = new JPanel(new BorderLayout(10, 10));
+        p.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
         tasksList = new JList<>();
         tasksList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        refreshTasksList();
-
-        JScrollPane scrollPane = new JScrollPane(tasksList);
-
-        // Buttons
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 5, 5));
-        JButton addButton = new JButton("Add Task");
-        JButton completeButton = new JButton("Mark as Completed");
-        JButton removeButton = new JButton("Remove Task");
-
-        addButton.addActionListener(e -> addTaskDialog());
-        completeButton.addActionListener(e -> completeTask());
-        removeButton.addActionListener(e -> removeTask());
-
-        buttonPanel.add(addButton);
-        buttonPanel.add(completeButton);
-        buttonPanel.add(removeButton);
-
-        panel.add(scrollPane, BorderLayout.CENTER);
-        panel.add(buttonPanel, BorderLayout.SOUTH);
-
-        return panel;
+        refreshTasks();
+        
+        JPanel btns = new JPanel(new GridLayout(1, 3, 5, 5));
+        btns.add(createBtn("Adicionar", e -> addTaskDialog()));
+        btns.add(createBtn("Concluir", e -> completeTask()));
+        btns.add(createBtn("Remover", e -> removeTask()));
+        
+        p.add(new JScrollPane(tasksList), BorderLayout.CENTER);
+        p.add(btns, BorderLayout.SOUTH);
+        return p;
     }
 
-    /**
-     * Creates the about panel.
-     *
-     * @return the about panel
-     */
-    private JPanel createAboutPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
-
-        JTextArea textArea = new JTextArea();
-        textArea.setText("Study Routine Manager\nVersion 1.0.0\n\n"
-                + "A simple and effective application to help students and university students\n"
-                + "organize and manage their study routine.\n\n"
-                + "Features:\n"
-                + "- Manage subjects/disciplines\n"
-                + "- Create and organize study tasks\n"
-                + "- Set priorities and due dates\n"
-                + "- Track task completion\n"
-                + "- Persistent data storage\n\n"
-                + "© 2026 Study Routine Manager");
-        textArea.setEditable(false);
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-
-        panel.add(new JScrollPane(textArea), BorderLayout.CENTER);
-
-        return panel;
+    private JPanel setupAboutPanel() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
+        JTextArea txt = new JTextArea();
+        txt.setText("Gerenciador de Rotina de Estudos v1.0.0\n\n"
+                + "Ajuda estudantes a organizar suas disciplinas e tarefas de estudo.\n\n"
+                + "Recursos:\n"
+                + "• Gerenciar disciplinas\n"
+                + "• Criar tarefas com datas e horários\n"
+                + "• Definir prioridades\n"
+                + "• Acompanhar progresso\n"
+                + "• Dados persistentes em JSON\n\n"
+                + "© 2026");
+        txt.setEditable(false);
+        txt.setLineWrap(true);
+        txt.setWrapStyleWord(true);
+        
+        p.add(new JScrollPane(txt));
+        return p;
     }
 
-    /**
-     * Opens a dialog to add a new subject.
-     */
-    private void addSubjectDialog() {
-        JDialog dialog = new JDialog(this, "Add Subject", true);
-        dialog.setSize(400, 300);
-        dialog.setLocationRelativeTo(this);
+    private JButton createBtn(String text, java.awt.event.ActionListener action) {
+        JButton btn = new JButton(text);
+        btn.addActionListener(action);
+        return btn;
+    }
 
-        JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
-        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        JLabel nameLabel = new JLabel("Subject Name:");
-        JTextField nameField = new JTextField();
-
-        JLabel profLabel = new JLabel("Professor:");
-        JTextField profField = new JTextField();
-
-        JLabel descLabel = new JLabel("Description:");
-        JTextArea descArea = new JTextArea(3, 20);
-
-        panel.add(nameLabel);
-        panel.add(nameField);
-        panel.add(profLabel);
-        panel.add(profField);
-        panel.add(descLabel);
-        panel.add(new JScrollPane(descArea));
-
-        JButton saveButton = new JButton("Save");
-        JButton cancelButton = new JButton("Cancel");
-
-        saveButton.addActionListener(e -> {
-            if (nameField.getText().trim().isEmpty()) {
-                return;
+    private void addDisciplineDialog() {
+        JDialog d = new JDialog(this, "Adicionar Disciplina", true);
+        d.setSize(400, 250);
+        d.setLocationRelativeTo(this);
+        
+        JPanel p = new JPanel(new GridLayout(4, 2, 5, 5));
+        p.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
+        JTextField name = new JTextField();
+        JTextField prof = new JTextField();
+        JTextArea desc = new JTextArea(3, 20);
+        
+        p.add(new JLabel("Nome:"));
+        p.add(name);
+        p.add(new JLabel("Professor:"));
+        p.add(prof);
+        p.add(new JLabel("Descrição:"));
+        p.add(new JScrollPane(desc));
+        
+        JButton save = createBtn("Salvar", e -> {
+            if (!name.getText().trim().isEmpty()) {
+                service.addSubject(name.getText(), prof.getText(), desc.getText());
+                refreshSubjects();
+                d.dispose();
             }
-            service.addSubject(nameField.getText(), profField.getText(), descArea.getText());
-            refreshSubjectsList();
-            dialog.dispose();
         });
-
-        cancelButton.addActionListener(e -> dialog.dispose());
-
-        panel.add(saveButton);
-        panel.add(cancelButton);
-
-        dialog.add(panel);
-        dialog.setVisible(true);
+        
+        JButton cancel = createBtn("Cancelar", e -> d.dispose());
+        p.add(save);
+        p.add(cancel);
+        
+        d.add(p);
+        d.setVisible(true);
     }
 
-    /**
-     * Removes the selected subject.
-     */
-    private void removeSubject() {
-        int selected = subjectsList.getSelectedIndex();
-        if (selected != -1) {
-            Subject subject = subjectsList.getSelectedValue();
-            service.removeSubject(subject.getId());
-            refreshSubjectsList();
-            refreshTasksList();
+    private void removeDiscipline() {
+        int idx = subjectsList.getSelectedIndex();
+        if (idx != -1) {
+            Subject s = subjectsList.getSelectedValue();
+            service.removeSubject(s.getId());
+            refreshSubjects();
+            refreshTasks();
         }
     }
 
-    /**
-     * Opens a dialog to add a new task.
-     */
     private void addTaskDialog() {
         List<Subject> subjects = service.getAllSubjects();
-        if (subjects.isEmpty()) {
-            return;
-        }
-
-        JDialog dialog = new JDialog(this, "Add Task", true);
-        dialog.setSize(500, 400);
-        dialog.setLocationRelativeTo(this);
-
-        JPanel panel = new JPanel(new GridLayout(7, 2, 5, 5));
-        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        JLabel subjectLabel = new JLabel("Subject:");
-        JList<Subject> subjectField = new JList<>(subjects.toArray(new Subject[0]));
-        subjectField.setSelectedIndex(0);
-
-        JLabel descLabel = new JLabel("Description:");
-        JTextArea descField = new JTextArea(2, 20);
-
-        JLabel dateLabel = new JLabel("Due Date (YYYY-MM-DD):");
-        JTextField dateField = new JTextField(LocalDate.now().toString());
-
-        JLabel startLabel = new JLabel("Start Time (HH:MM):");
-        JTextField startField = new JTextField("09:00");
-
-        JLabel endLabel = new JLabel("End Time (HH:MM):");
-        JTextField endField = new JTextField("10:00");
-
-        JLabel priorityLabel = new JLabel("Priority (1-5):");
-        JSpinner prioritySpinner = new JSpinner(new SpinnerNumberModel(3, 1, 5, 1));
-
-        panel.add(subjectLabel);
-        panel.add(new JScrollPane(subjectField));
-        panel.add(descLabel);
-        panel.add(new JScrollPane(descField));
-        panel.add(dateLabel);
-        panel.add(dateField);
-        panel.add(startLabel);
-        panel.add(startField);
-        panel.add(endLabel);
-        panel.add(endField);
-        panel.add(priorityLabel);
-        panel.add(prioritySpinner);
-
-        JButton saveButton = new JButton("Save");
-        JButton cancelButton = new JButton("Cancel");
-
-        saveButton.addActionListener(e -> {
+        if (subjects.isEmpty()) return;
+        
+        JDialog d = new JDialog(this, "Adicionar Tarefa", true);
+        d.setSize(500, 350);
+        d.setLocationRelativeTo(this);
+        
+        JPanel p = new JPanel(new GridLayout(7, 2, 5, 5));
+        p.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
+        JList<Subject> subj = new JList<>(subjects.toArray(new Subject[0]));
+        subj.setSelectedIndex(0);
+        
+        JTextArea desc = new JTextArea(2, 20);
+        JTextField date = new JTextField(LocalDate.now().toString());
+        JTextField start = new JTextField("09:00");
+        JTextField end = new JTextField("10:00");
+        JSpinner priority = new JSpinner(new SpinnerNumberModel(3, 1, 5, 1));
+        
+        p.add(new JLabel("Disciplina:"));
+        p.add(new JScrollPane(subj));
+        p.add(new JLabel("Tarefa:"));
+        p.add(new JScrollPane(desc));
+        p.add(new JLabel("Data (YYYY-MM-DD):"));
+        p.add(date);
+        p.add(new JLabel("Início (HH:MM):"));
+        p.add(start);
+        p.add(new JLabel("Fim (HH:MM):"));
+        p.add(end);
+        p.add(new JLabel("Prioridade (1-5):"));
+        p.add(priority);
+        
+        JButton save = createBtn("Salvar", e -> {
             try {
-                Subject selected = subjectField.getSelectedValue();
-                if (selected != null && !descField.getText().trim().isEmpty()) {
-                    LocalDate date = LocalDate.parse(dateField.getText());
-                    LocalTime start = LocalTime.parse(startField.getText());
-                    LocalTime end = LocalTime.parse(endField.getText());
-                    int priority = (int) prioritySpinner.getValue();
-
-                    service.addTask(selected.getId(), descField.getText(), date, start, end, priority);
-                    refreshTasksList();
-                    dialog.dispose();
+                Subject s = subj.getSelectedValue();
+                if (s != null && !desc.getText().trim().isEmpty()) {
+                    service.addTask(s.getId(), desc.getText(), 
+                        LocalDate.parse(date.getText()),
+                        LocalTime.parse(start.getText()),
+                        LocalTime.parse(end.getText()),
+                        (int) priority.getValue());
+                    refreshTasks();
+                    d.dispose();
                 }
             } catch (Exception ex) {
-                // Handle parse error silently
+                JOptionPane.showMessageDialog(d, "Erro: " + ex.getMessage());
             }
         });
-
-        cancelButton.addActionListener(e -> dialog.dispose());
-
-        panel.add(saveButton);
-        panel.add(cancelButton);
-
-        dialog.add(panel);
-        dialog.setVisible(true);
+        
+        JButton cancel = createBtn("Cancelar", e -> d.dispose());
+        p.add(save);
+        p.add(cancel);
+        
+        d.add(p);
+        d.setVisible(true);
     }
 
-    /**
-     * Marks the selected task as completed.
-     */
     private void completeTask() {
-        int selected = tasksList.getSelectedIndex();
-        if (selected != -1) {
-            StudyTask task = tasksList.getSelectedValue();
-            service.markTaskAsCompleted(task.getId());
-            refreshTasksList();
+        int idx = tasksList.getSelectedIndex();
+        if (idx != -1) {
+            StudyTask t = tasksList.getSelectedValue();
+            service.markTaskAsCompleted(t.getId());
+            refreshTasks();
         }
     }
 
-    /**
-     * Removes the selected task.
-     */
     private void removeTask() {
-        int selected = tasksList.getSelectedIndex();
-        if (selected != -1) {
-            StudyTask task = tasksList.getSelectedValue();
-            service.removeTask(task.getId());
-            refreshTasksList();
+        int idx = tasksList.getSelectedIndex();
+        if (idx != -1) {
+            StudyTask t = tasksList.getSelectedValue();
+            service.removeTask(t.getId());
+            refreshTasks();
         }
     }
 
-    /**
-     * Refreshes the subjects list display.
-     */
-    private void refreshSubjectsList() {
+    private void refreshSubjects() {
         subjectsList.setListData(service.getAllSubjects().toArray(new Subject[0]));
     }
 
-    /**
-     * Refreshes the tasks list display.
-     */
-    private void refreshTasksList() {
+    private void refreshTasks() {
         tasksList.setListData(service.getAllTasks().toArray(new StudyTask[0]));
     }
 
-    /**
-     * Main method to start the application.
-     *
-     * @param args command line arguments
-     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(MainWindow::new);
     }
