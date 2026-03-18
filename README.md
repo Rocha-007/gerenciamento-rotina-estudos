@@ -1,6 +1,6 @@
 # Study Routine Manager
 
-![CI Status](https://github.com/your-username/study-routine-manager/actions/workflows/ci.yml/badge.svg)
+![CI Status](https://github.com/Rocha-007/study-routine-manager/actions/workflows/ci.yml/badge.svg)
 
 A simple and effective desktop application to help students and university students organize and manage their study routine efficiently.
 
@@ -264,6 +264,22 @@ All subjects and tasks are automatically saved to the `data/` directory in JSON 
 
 Your data is preserved between application sessions.
 
+## Design Decisions
+
+Durante o desenvolvimento, foram tomadas as seguintes decisões de design:
+
+### UI Framework
+- **Swing**: Escolhido por ser incluído no JDK, sem dependências externas. Desenvolvimento mais rápido.
+
+### Data Persistence
+- **JSON com Gson**: Alternativa simplificada ao banco de dados relacional. Adequado para projeto de escala pequena/média e facilita portabilidade dos dados.
+
+### Architecture Pattern
+- **Service Pattern**: Separação clara entre UI (MainWindow), lógica de negócio (StudyRoutineService) e modelos de dados (Subject, StudyTask). Facilita testes e manutenção.
+
+### Testing Strategy
+- **JUnit 5**: Framework padrão da indústria. Testes abrangem modelos, serviço e casos limítrofes.
+
 ## Version
 
 Current Version: **1.0.0** (Semantic Versioning - MAJOR.MINOR.PATCH)
@@ -274,11 +290,11 @@ Current Version: **1.0.0** (Semantic Versioning - MAJOR.MINOR.PATCH)
 
 ## Author
 
-[Your Name]
+[Your Name] - github.com/Rocha-007
 
 ## Repository
 
-**GitHub Repository**: https://github.com/your-username/study-routine-manager
+**GitHub Repository**: https://github.com/Rocha-007/study-routine-manager
 
 ## License
 

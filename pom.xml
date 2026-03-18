@@ -12,17 +12,17 @@
 
     <name>Study Routine Manager</name>
     <description>Application to help students and university students organize their study routine</description>
-    <url>https://github.com/your-username/study-routine-manager</url>
+    <url>https://github.com/Rocha-007/study-routine-manager</url>
 
     <scm>
-        <url>https://github.com/your-username/study-routine-manager</url>
-        <connection>scm:git:https://github.com/your-username/study-routine-manager.git</connection>
-        <developerConnection>scm:git:git@github.com:your-username/study-routine-manager.git</developerConnection>
+        <url>https://github.com/Rocha-007/study-routine-manager</url>
+        <connection>scm:git:https://github.com/Rocha-007/study-routine-manager.git</connection>
+        <developerConnection>scm:git:git@github.com:Rocha-007/study-routine-manager.git</developerConnection>
     </scm>
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/your-username/study-routine-manager/issues</url>
+        <url>https://github.com/Rocha-007/study-routine-manager/issues</url>
     </issueManagement>
 
     <properties>

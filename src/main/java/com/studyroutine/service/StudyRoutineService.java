@@ -16,6 +16,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Serviço central para gerenciamento de disciplinas e tarefas.
+ * Utiliza Gson para serialização/desserialização JSON.
+ * 
+ * Escolhi JSON ao invés de banco de dados porque:
+ * - Simplicidade: Sem necessidade de configurar BD
+ * - Portabilidade: Dados em arquivo, fácil transportar
+ * - Adequado para projeto pequeno/médio
+ * - Facilita testes
+ */
 public class StudyRoutineService {
     private static final String DATA_DIR = "data";
     private static final String SUBJECTS_FILE = DATA_DIR + File.separator + "subjects.json";

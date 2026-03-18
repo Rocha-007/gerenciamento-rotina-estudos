@@ -10,6 +10,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * Janela principal da aplicação.
+ * Utiliza JTabbedPane para organizar as funcionalidades em abas
+ * (Disciplinas, Tarefas, Sobre).
+ */
 public class MainWindow extends JFrame {
     private StudyRoutineService service;
     private JList<Subject> subjectsList;
@@ -18,10 +23,11 @@ public class MainWindow extends JFrame {
     public MainWindow() {
         service = new StudyRoutineService();
         
+        // Configurações básicas da janela
         setTitle("Gerenciador de Rotina de Estudos");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(900, 600);
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(null); // Centraliza na tela
         setResizable(true);
         
         setupUI();
@@ -29,6 +35,8 @@ public class MainWindow extends JFrame {
     }
 
     private void setupUI() {
+        // Layout com abas foi a melhor forma encontrada para organizar
+        // sem deixar a interface poluída
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Disciplinas", setupDisciplinesPanel());
         tabs.addTab("Tarefas", setupTasksPanel());
@@ -37,6 +45,8 @@ public class MainWindow extends JFrame {
     }
 
     private JPanel setupDisciplinesPanel() {
+        // BorderLayout com list view + botões na parte inferior
+        // Escolhi essa abordagem para manter simplicidade e organização
         JPanel p = new JPanel(new BorderLayout(10, 10));
         p.setBorder(new EmptyBorder(10, 10, 10, 10));
         
@@ -54,6 +64,8 @@ public class MainWindow extends JFrame {
     }
 
     private JPanel setupTasksPanel() {
+        // Similar ao painel de disciplinas, mas com 3 botões
+        // (Adicionar, Concluir, Remover) - mais funcionalidades para tarefas
         JPanel p = new JPanel(new BorderLayout(10, 10));
         p.setBorder(new EmptyBorder(10, 10, 10, 10));
         
@@ -145,6 +157,7 @@ public class MainWindow extends JFrame {
     }
 
     private void addTaskDialog() {
+        // Valida se há disciplinas criadas antes de adicionar tarefa
         List<Subject> subjects = service.getAllSubjects();
         if (subjects.isEmpty()) return;
         
@@ -155,6 +168,7 @@ public class MainWindow extends JFrame {
         JPanel p = new JPanel(new GridLayout(7, 2, 5, 5));
         p.setBorder(new EmptyBorder(10, 10, 10, 10));
         
+        // JList para selecionar a disciplina associada à tarefa
         JList<Subject> subj = new JList<>(subjects.toArray(new Subject[0]));
         subj.setSelectedIndex(0);
         
@@ -229,6 +243,8 @@ public class MainWindow extends JFrame {
     }
 
     public static void main(String[] args) {
+        // SwingUtilities.invokeLater garante que a GUI é criada
+        // na Event Dispatch Thread (EDT) - prática recomendada
         SwingUtilities.invokeLater(MainWindow::new);
     }
 }
