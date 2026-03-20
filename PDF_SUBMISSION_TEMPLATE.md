@@ -40,7 +40,7 @@ Solution Overview:
 
 
 GitHub Repository:
-    https://github.com/[your-username]/study-routine-manager
+    https://github.com/Rocha-007/gerenciamento-rotina-estudos
 
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -100,11 +100,11 @@ HOW TO ACCESS AND VERIFY THE PROJECT
 ───────────────────────────────────────────────────────────────────────────────
 
 1. Repository Access:
-   https://github.com/[your-username]/study-routine-manager
+   https://github.com/Rocha-007/gerenciamento-rotina-estudos
 
 2. Clone the Repository:
-   $ git clone https://github.com/[your-username]/study-routine-manager.git
-   $ cd study-routine-manager
+   $ git clone https://github.com/Rocha-007/gerenciamento-rotina-estudos.git
+   $ cd gerenciamento-rotina-estudos
 
 3. Build the Project:
    $ mvn clean package
@@ -123,7 +123,7 @@ HOW TO ACCESS AND VERIFY THE PROJECT
    $ mvn checkstyle:check
 
 7. View CI/CD Pipeline:
-   Visit: https://github.com/[your-username]/study-routine-manager/actions
+   Visit: https://github.com/Rocha-007/gerenciamento-rotina-estudos/actions
 
 ═══════════════════════════════════════════════════════════════════════════════
 
