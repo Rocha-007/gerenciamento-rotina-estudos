@@ -4,6 +4,26 @@
 
 A simple and effective desktop application to help students and university students organize and manage their study routine efficiently.
 
+---
+
+## 🚀 GET STARTED IN 30 SECONDS
+
+**Requirements:** Only Java 11+ installed
+
+**Step 1:** Clone the repository
+```bash
+git clone https://github.com/Rocha-007/gerenciamento-rotina-estudos.git
+cd gerenciamento-rotina-estudos
+```
+
+**Step 2:** Run the application
+- **Windows:** Double-click `run.bat`
+- **Linux/Mac:** `./run.sh` (then `chmod +x run.sh` if needed)
+
+✅ Done! The application will start automatically.
+
+---
+
 ## Table of Contents
 
 - [Problem Statement](#problem-statement)
@@ -113,6 +133,25 @@ mvn clean package
 ```
 
 ## Running the Application
+
+### ⚡ EASIEST WAY (Recommended - Just One Click!)
+
+If you have Java installed, simply run:
+
+**Windows:**
+```bash
+Double-click: run.bat
+```
+
+**Linux/Mac:**
+```bash
+chmod +x run.sh
+./run.sh
+```
+
+That's it! The script will handle everything automatically.
+
+---
 
 ### Option 1: Using Maven
 

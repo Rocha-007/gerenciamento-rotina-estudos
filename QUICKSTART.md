@@ -1,5 +1,24 @@
 # Quick Start Guide
 
+## ⚡ EASIEST WAY TO RUN (Recommended)
+
+### Just need Java installed? Then do this:
+
+**Windows:**
+```bash
+Double-click: run.bat
+```
+
+**Linux/Mac:**
+```bash
+chmod +x run.sh
+./run.sh
+```
+
+That's it! The script will automatically build and run the application.
+
+---
+
 ## Initial Setup
 
 ### 1. Install Java Development Kit (JDK)
