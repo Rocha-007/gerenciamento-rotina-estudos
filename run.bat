@@ -7,6 +7,9 @@ echo   Study Routine Manager v1.0.0
 echo ========================================
 echo.
 
+REM Add Maven to PATH if not already present
+set "PATH=%USERPROFILE%\tools\apache-maven-3.9.6\bin;%PATH%"
+
 REM Check if Java is installed
 java -version >nul 2>&1
 if errorlevel 1 (
