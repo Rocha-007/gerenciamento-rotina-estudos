@@ -85,16 +85,20 @@ The application uses a simple GUI (Graphical User Interface) for easy interactio
 - ✅ **Persistent Data Storage**: Automatic saving to local JSON files
 - ✅ **User-Friendly GUI**: Simple and intuitive interface using Swing
 - ✅ **Cross-Platform**: Works on Windows, macOS, and Linux
+- ✨ **Public Holidays Integration**: Alerts when scheduling tasks on national holidays (Etapa 2)
+- ✨ **Holiday API Integration**: Consumes public API for Brazilian national holidays
 
 ## Technologies Used
 
-- **Language**: Java 11
+- **Language**: Java 11+
 - **GUI Framework**: Swing (standard Java library)
 - **Build Tool**: Maven 3.9+
 - **Testing Framework**: JUnit 5
 - **Code Quality**: Checkstyle
 - **Data Persistence**: Gson (JSON processing)
 - **CI/CD**: GitHub Actions
+- **External API**: Nager.Date Public Holidays API (https://api.nager.date)
+- **Testing Mock**: Mockito 5.2.0
 
 ## System Requirements
 
@@ -303,6 +307,40 @@ All subjects and tasks are automatically saved to the `data/` directory in JSON 
 
 Your data is preserved between application sessions.
 
+## 🌐 API Integration (Etapa 2 - Entrega Intermediária)
+
+### Holiday Service
+The application integrates with a **public API for Brazilian national holidays** to enhance the study planning experience.
+
+**API**: [Nager.Date Public Holidays API](https://api.nager.date)
+
+**Features**:
+- 🔍 Checks if a date is a national holiday
+- ⚠️ Alerts user when scheduling tasks on holidays
+- 📅 Shows upcoming holidays for better planning
+- ⚡ Caches responses to optimize performance
+
+**Implementation**:
+- `HolidayService.java` - Core API consumer
+- `Holiday.java` - Data model for holiday information
+- Full test coverage with integration and unit tests
+
+**Example Usage**:
+```java
+HolidayService holidayService = new HolidayService();
+boolean isHoliday = holidayService.isHoliday(LocalDate.now());
+String holidayName = holidayService.getHolidayName(LocalDate.of(2024, 1, 1));
+```
+
+**Testing**:
+```bash
+# Integration tests (requires internet)
+mvn test -Dtest=HolidayServiceIntegrationTest
+
+# Unit tests (uses mocking, no internet required)
+mvn test -Dtest=HolidayServiceUnitTest
+```
+
 ## Design Decisions
 
 Durante o desenvolvimento, foram tomadas as seguintes decisões de design:
@@ -319,10 +357,20 @@ Durante o desenvolvimento, foram tomadas as seguintes decisões de design:
 ### Testing Strategy
 - **JUnit 5**: Framework padrão da indústria. Testes abrangem modelos, serviço e casos limítrofes.
 
+### API Integration (Etapa 2)
+- **Public API**: Escolhida uma API pública aberta (Nager.Date) que não requer autenticação
+- **Resilience**: Falhas na API não interrompem a aplicação (graceful degradation)
+- **Caching**: Respostas da API são armazenadas em cache para melhorar performance
+- **Testing**: Testes de integração (com API real) + testes unitários (com mocking)
+
 ## Version
 
-Current Version: **1.0.0** (Semantic Versioning - MAJOR.MINOR.PATCH)
+Current Version: **1.1.0-intermediaria** (Etapa 2 em progresso)
 
+- **1.0.0**: Funcionalidades base (Etapa 1)
+- **1.1.0**: Integração com API Pública + Testes de Integração (Etapa 2)
+
+Semantic Versioning (MAJOR.MINOR.PATCH):
 - MAJOR: Breaking changes
 - MINOR: New features (backwards compatible)
 - PATCH: Bug fixes
