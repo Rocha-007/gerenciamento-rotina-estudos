@@ -25,6 +25,10 @@ import java.util.UUID;
  * - Portabilidade: Dados em arquivo, fácil transportar
  * - Adequado para projeto pequeno/médio
  * - Facilita testes
+ * 
+ * Na Etapa 2 (Entrega Intermediária), integrou-se o HolidayService
+ * para consumir dados de uma API pública de Feriados Nacionais Brasileiros.
+ * Isso permite alertar o usuário quando agenda tarefas em feriados.
  */
 public class StudyRoutineService {
     private static final String DATA_DIR = "data";
@@ -34,6 +38,7 @@ public class StudyRoutineService {
     private List<Subject> subjects;
     private List<StudyTask> tasks;
     private Gson gson;
+    private HolidayService holidayService;
 
     public StudyRoutineService() {
         gson = new GsonBuilder()
@@ -43,6 +48,7 @@ public class StudyRoutineService {
                 .create();
         subjects = new ArrayList<>();
         tasks = new ArrayList<>();
+        holidayService = new HolidayService();
 
         ensureDataDirectory();
         loadSubjects();
@@ -172,5 +178,83 @@ public class StudyRoutineService {
         } catch (IOException e) {
             System.err.println("Erro carregando tarefas: " + e.getMessage());
         }
+    }
+
+    // ===== INTEGRAÇÃO COM API DE FERIADOS =====
+    
+    /**
+     * Verifica se uma data é um feriado nacional brasileiro.
+     * Utiliza a integração com API pública de Feriados.
+     * 
+     * @param date Data a verificar
+     * @return true se for feriado, false caso contrário
+     */
+    public boolean isHoliday(LocalDate date) {
+        try {
+            return holidayService.isHoliday(date);
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Aviso: Não foi possível verificar feriados. " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Obtém o nome do feriado para uma data específica.
+     * 
+     * @param date Data a verificar
+     * @return Nome do feriado, ou string vazia se não for feriado
+     */
+    public String getHolidayName(LocalDate date) {
+        try {
+            return holidayService.getHolidayName(date);
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Aviso: Não foi possível obter nome do feriado. " + e.getMessage());
+            return "";
+        }
+    }
+
+    /**
+     * Obtém um aviso se a data de uma tarefa for um feriado.
+     * Útil para alertar o usuário na UI.
+     * 
+     * @param dueDate Data de vencimento da tarefa
+     * @return Mensagem de aviso se for feriado, ou string vazia caso contrário
+     */
+    public String getHolidayWarning(LocalDate dueDate) {
+        if (dueDate == null) {
+            return "";
+        }
+        
+        try {
+            if (holidayService.isHoliday(dueDate)) {
+                String holidayName = holidayService.getHolidayName(dueDate);
+                return String.format("⚠️ Aviso: %s é um feriado nacional!", holidayName);
+            }
+        } catch (IOException | InterruptedException e) {
+            // Silenciosamente falha - não interrompe a funcionalidade
+            System.err.println("Aviso: Erro ao verificar feriados: " + e.getMessage());
+        }
+        
+        return "";
+    }
+
+    /**
+     * Obtém os próximos feriados para ajudar o usuário na planejamento.
+     * 
+     * @param fromDate Data inicial
+     * @param limit Número máximo de feriados a retornar
+     * @return Lista de próximos feriados
+     */
+    public List<String> getUpcomingHolidaysInfo(LocalDate fromDate, int limit) {
+        List<String> info = new ArrayList<>();
+        try {
+            var upcoming = holidayService.getUpcomingHolidays(fromDate, limit);
+            for (var holiday : upcoming) {
+                info.add(String.format("%s (%s)", holiday.getLocalName(), holiday.getDate()));
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Aviso: Não foi possível obter próximos feriados. " + e.getMessage());
+        }
+        return info;
     }
 }
